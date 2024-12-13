@@ -1,0 +1,33 @@
+name: Generate and Publish RSS Feed
+
+on:
+  schedule:
+    - cron: '0 0 * * *'  # Kjør daglig kl. 00:00
+  workflow_dispatch:  # Tillat manuell kjøring
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v3
+
+      - name: Set up Python
+        uses: actions/setup-python@v4
+        with:
+          python-version: '3.x'
+
+      - name: Install dependencies
+        run: pip install requests
+
+      - name: Generate RSS Feed
+        run: python generate_rss.py
+
+      - name: Commit and Push RSS Feed
+        run: |
+          git config --local user.name "github-actions[bot]"
+          git config --local user.email "github-actions[bot]@users.noreply.github.com"
+          git add rss.xml
+          git commit -m "Update RSS feed"
+          git push
